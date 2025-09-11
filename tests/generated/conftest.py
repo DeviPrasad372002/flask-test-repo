@@ -3,16 +3,13 @@ import sys
 import os
 import warnings
 
-# Suppress noisy deprecation warnings that clutter CI logs
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 warnings.filterwarnings("ignore", category=PendingDeprecationWarning)
 
-# Add project root to Python path (tests/ directory is the working dir)
 project_root = os.path.dirname(os.path.abspath(__file__))
 if project_root not in sys.path:
     sys.path.insert(0, project_root)
 
-# ---- Compatibility shims (safe) ----
 def _fix_jinja2_compatibility():
     try:
         import jinja2
@@ -53,16 +50,10 @@ _fix_jinja2_compatibility()
 _fix_collections_compatibility()
 _fix_flask_compatibility()
 
-# NOTE: We DO NOT force database URLs here; misconfig should fail loudly in strict mode.
-# We only disable CSRF to make form tests simpler.
 os.environ.setdefault('WTF_CSRF_ENABLED', 'False')
 
 @pytest.fixture
 def app():
-    """
-    Attempt to locate a Flask app or factory in common places.
-    If not found, tests that rely on it will skip explicitly.
-    """
     try:
         candidates = [
             ('conduit.app', 'create_app'),
